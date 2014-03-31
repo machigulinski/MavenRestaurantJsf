@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:p="http://primefaces.org/ui">
 
     <ui:composition template="/template.xhtml">
         <ui:define name="title">
@@ -16,13 +16,13 @@
             <h:form>
                 <h:panelGrid columns="2">
                     <h:outputLabel value="#{bundle.CreateMenuItemLabel_itemId}" for="itemId" />
-                    <h:inputText id="itemId" value="#{menuItemController.selected.itemId}" title="#{bundle.CreateMenuItemTitle_itemId}" required="true" requiredMessage="#{bundle.CreateMenuItemRequiredMessage_itemId}"/>
+                    <p:inputText id="itemId" value="#{menuItemController.selected.itemId}" title="#{bundle.CreateMenuItemTitle_itemId}" required="true" requiredMessage="#{bundle.CreateMenuItemRequiredMessage_itemId}"/>
                     <h:outputLabel value="#{bundle.CreateMenuItemLabel_itemName}" for="itemName" />
-                    <h:inputText id="itemName" value="#{menuItemController.selected.itemName}" title="#{bundle.CreateMenuItemTitle_itemName}" required="true" requiredMessage="#{bundle.CreateMenuItemRequiredMessage_itemName}"/>
+                    <p:inputText id="itemName" value="#{menuItemController.selected.itemName}" title="#{bundle.CreateMenuItemTitle_itemName}" required="true" requiredMessage="#{bundle.CreateMenuItemRequiredMessage_itemName}"/>
                     <h:outputLabel value="#{bundle.CreateMenuItemLabel_itemInfo}" for="itemInfo" />
-                    <h:inputTextarea rows="4" cols="30" id="itemInfo" value="#{menuItemController.selected.itemInfo}" title="#{bundle.CreateMenuItemTitle_itemInfo}" />
+                    <p:inputTextarea rows="4" cols="30" id="itemInfo" value="#{menuItemController.selected.itemInfo}" title="#{bundle.CreateMenuItemTitle_itemInfo}" />
                     <h:outputLabel value="#{bundle.CreateMenuItemLabel_itemPrice}" for="itemPrice" />
-                    <h:inputText id="itemPrice" value="#{menuItemController.selected.itemPrice}" title="#{bundle.CreateMenuItemTitle_itemPrice}" />
+                    <p:inputText id="itemPrice" value="#{menuItemController.selected.itemPrice}" title="#{bundle.CreateMenuItemTitle_itemPrice}" />
                 </h:panelGrid>
                 <br />
                 <h:commandLink action="#{menuItemController.create}" value="#{bundle.CreateMenuItemSaveLink}" />
