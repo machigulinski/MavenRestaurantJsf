@@ -2,234 +2,105 @@ package com.gulin.restaurant.jsf;
 
 import com.gulin.restaurant.model.MenuItem;
 import com.gulin.restaurant.jsf.util.JsfUtil;
-import com.gulin.restaurant.jsf.util.PaginationHelper;
 import com.gulin.restaurant.ejb.MenuItemFacade;
-
 import java.io.Serializable;
+import java.util.List;
 import java.util.ResourceBundle;
-import javax.ejb.EJB;
+import javax.annotation.PostConstruct;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
-import javax.faces.model.DataModel;
-import javax.faces.model.ListDataModel;
-import javax.faces.model.SelectItem;
+import javax.inject.Inject;
 
 @Named("menuItemController")
 @SessionScoped
 public class MenuItemController implements Serializable {
 
-    private MenuItem current;
-    private DataModel items = null;
-    @EJB
-    private com.gulin.restaurant.ejb.MenuItemFacade ejbFacade;
-    private PaginationHelper pagination;
+    private MenuItem selectedItem;
+    private List<MenuItem> menuItems = null;
+    @Inject
+    private MenuItemFacade itemEao;
     private int selectedItemIndex;
 
     public MenuItemController() {
     }
 
-    public MenuItem getSelected() {
-	if (current == null) {
-	    current = new MenuItem();
-	    selectedItemIndex = -1;
+    @PostConstruct
+    public void loadMenuItems() {
+	this.setMenuItems(getItemEao().findAll());
+    }
+
+    public String displayItemDetails() {
+	if (this.getSelectedItem() == null) {
+	    JsfUtil.addSuccessMessage("Please select an item first by click on a row.");
 	}
-	return current;
+	return "ItemDetails";
     }
 
-    private MenuItemFacade getFacade() {
-	return ejbFacade;
-    }
-
-    public PaginationHelper getPagination() {
-	if (pagination == null) {
-	    pagination = new PaginationHelper(10) {
-
-		@Override
-		public int getItemsCount() {
-		    return getFacade().count();
-		}
-
-		@Override
-		public DataModel createPageDataModel() {
-		    return new ListDataModel(getFacade().findRange(new int[]{getPageFirstItem(), getPageFirstItem() + getPageSize()}));
-		}
-	    };
-	}
-	return pagination;
-    }
-
-    public String prepareList() {
-	recreateModel();
-	return "List";
-    }
-
-    public String prepareView() {
-	current = (MenuItem) getItems().getRowData();
-	selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
-	return "View";
+    public String displayMenuItems() {
+	return "menu_items";
     }
 
     public String prepareCreate() {
-	current = new MenuItem();
+	selectedItem = new MenuItem();
 	selectedItemIndex = -1;
-	return "Create";
+	return "create";
     }
 
     public String create() {
 	try {
-	    getFacade().create(current);
+	    this.getItemEao().create(selectedItem);
 	    JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("MenuItemCreated"));
 	    return prepareCreate();
 	} catch (Exception e) {
 	    JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
 	    return null;
+	} finally {
+	    loadMenuItems();
 	}
     }
 
-    public String prepareEdit() {
-	current = (MenuItem) getItems().getRowData();
-	selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
-	return "Edit";
-    }
+    public String deleteItem() {
 
-    public String update() {
 	try {
-	    getFacade().edit(current);
-	    JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("MenuItemUpdated"));
-	    return "View";
+	    this.getItemEao().remove(selectedItem);
+	    JsfUtil.addSuccessMessage("Item Successfuly Deleted");
+	    loadMenuItems();
 	} catch (Exception e) {
-	    JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+	    JsfUtil.addErrorMessage("Please, click on a row to select the item you want to remove.");
 	    return null;
 	}
+	return "menu_items";
+
     }
 
-    public String destroy() {
-	current = (MenuItem) getItems().getRowData();
-	selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
-	performDestroy();
-	recreatePagination();
-	recreateModel();
-	return "List";
+    public MenuItem getMenuItem(int id) {
+	return itemEao.find(id);
     }
 
-    public String destroyAndView() {
-	performDestroy();
-	recreateModel();
-	updateCurrentItem();
-	if (selectedItemIndex >= 0) {
-	    return "View";
-	} else {
-	    // all items were removed - go back to list
-	    recreateModel();
-	    return "List";
-	}
+    public List<MenuItem> getMenuItems() {
+	return menuItems;
     }
 
-    private void performDestroy() {
-	try {
-	    getFacade().remove(current);
-	    JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("MenuItemDeleted"));
-	} catch (Exception e) {
-	    JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
-	}
+    public void setMenuItems(List<MenuItem> menuItems) {
+	this.menuItems = menuItems;
     }
 
-    private void updateCurrentItem() {
-	int count = getFacade().count();
-	if (selectedItemIndex >= count) {
-	    // selected index cannot be bigger than number of items:
-	    selectedItemIndex = count - 1;
-	    // go to previous page if last page disappeared:
-	    if (pagination.getPageFirstItem() >= count) {
-		pagination.previousPage();
-	    }
-	}
-	if (selectedItemIndex >= 0) {
-	    current = getFacade().findRange(new int[]{selectedItemIndex, selectedItemIndex + 1}).get(0);
-	}
+    public MenuItem getSelectedItem() {
+	return selectedItem;
     }
 
-    public DataModel getItems() {
-	if (items == null) {
-	    items = getPagination().createPageDataModel();
-	}
-	return items;
+    public void setSelectedItem(MenuItem selectedItem) {
+	this.selectedItem = selectedItem;
     }
 
-    private void recreateModel() {
-	items = null;
+    public MenuItemFacade getItemEao() {
+	return itemEao;
     }
 
-    private void recreatePagination() {
-	pagination = null;
-    }
-
-    public String next() {
-	getPagination().nextPage();
-	recreateModel();
-	return "List";
-    }
-
-    public String previous() {
-	getPagination().previousPage();
-	recreateModel();
-	return "List";
-    }
-
-    public SelectItem[] getItemsAvailableSelectMany() {
-	return JsfUtil.getSelectItems(ejbFacade.findAll(), false);
-    }
-
-    public SelectItem[] getItemsAvailableSelectOne() {
-	return JsfUtil.getSelectItems(ejbFacade.findAll(), true);
-    }
-
-    public MenuItem getMenuItem(java.lang.Integer id) {
-	return ejbFacade.find(id);
-    }
-
-    @FacesConverter(forClass = MenuItem.class)
-    public static class MenuItemControllerConverter implements Converter {
-
-	@Override
-	public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
-	    if (value == null || value.length() == 0) {
-		return null;
-	    }
-	    MenuItemController controller = (MenuItemController) facesContext.getApplication().getELResolver().
-		    getValue(facesContext.getELContext(), null, "menuItemController");
-	    return controller.getMenuItem(getKey(value));
-	}
-
-	java.lang.Integer getKey(String value) {
-	    java.lang.Integer key;
-	    key = Integer.valueOf(value);
-	    return key;
-	}
-
-	String getStringKey(java.lang.Integer value) {
-	    StringBuilder sb = new StringBuilder();
-	    sb.append(value);
-	    return sb.toString();
-	}
-
-	@Override
-	public String getAsString(FacesContext facesContext, UIComponent component, Object object) {
-	    if (object == null) {
-		return null;
-	    }
-	    if (object instanceof MenuItem) {
-		MenuItem o = (MenuItem) object;
-		return getStringKey(o.getItemId());
-	    } else {
-		throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + MenuItem.class.getName());
-	    }
-	}
-
+    public void setItemEao(MenuItemFacade itemEao) {
+	this.itemEao = itemEao;
     }
 
 }
+
+
