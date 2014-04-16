@@ -12,7 +12,7 @@
     
      <!-- for spring security -->
     <lifecycle>
-        <phase-listener>edu.wctc.maven.glassfish.jsfsecure.util.LoginErrorPhaseListener</phase-listener>
+        <phase-listener>com.gulin.maven.glassfish.MavenRestaurantJsf.util.LoginErrorPhaseListener</phase-listener>
     </lifecycle>
     
   
