@@ -80,12 +80,13 @@ public class MenuItemController implements Serializable {
 	try {
 	    this.getItemEao().remove(selectedItem);
 	    JsfUtil.addSuccessMessage("Item Successfuly Deleted");
-	    loadMenuItems();
-	} catch (Exception e) {
-	    JsfUtil.addErrorMessage("Please, click on a row to select the item you want to remove.");
+	    } catch (Exception e) {
+//	    JsfUtil.addErrorMessage("Please, click on a row to select the item you want to remove.");
 	    return null;
-	}
-	return "menu_items";
+	} finally {
+	    loadMenuItems();	    
+	    this.setSelectedItem(null);}
+	    return "menu_items";
     }
     
      public void handleItemSelect() {
