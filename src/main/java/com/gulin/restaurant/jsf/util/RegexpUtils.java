@@ -1,4 +1,4 @@
-package com.gulin.maven.glassfish.MavenRestaurantJsf.util;
+package com.gulin.restaurant.jsf.util;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

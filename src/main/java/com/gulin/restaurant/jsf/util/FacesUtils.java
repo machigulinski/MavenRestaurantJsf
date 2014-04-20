@@ -1,4 +1,4 @@
-package com.gulin.maven.glassfish.MavenRestaurantJsf.util;
+package com.gulin.restaurant.jsf.util;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;

@@ -11,9 +11,9 @@
         </ui:define>
         <ui:define name="body">
             <h:panelGroup id="messagePanel" layout="block">
-                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+                <p:messages id="messages" autoUpdate="true" closable="true" />
             </h:panelGroup>
-            <h:form>
+            <h:form id="form">
                 <p:panelGrid columns="2">
                     
 		    <p:outputLabel value="Menu Item" for="itemName" />
@@ -24,9 +24,13 @@
                     
 		    <p:outputLabel value="Price" for="itemPrice" />
                     <p:inputText id="itemPrice" value="#{menuItemController.selectedItem.itemPrice}" title="#{bundle.CreateMenuItemTitle_itemPrice}" />
-                </p:panelGrid>
+                
+		    	
+		</p:panelGrid>
                 <br />
-                <h:commandLink action="#{menuItemController.create()}" value="#{bundle.CreateMenuItemSaveLink}" />
+		
+		<p:commandButton value="Ajax Save" update=":form :messages" id="ajax"  
+				 actionListener="#{menuItemController.create()}" styleClass="ui-priority-primary"/>  
                 <br />
 		<br />
                 <h:commandLink action="#{menuItemController.displayMenuItems()}" value="Show Menu Items" immediate="true"/>

@@ -1,4 +1,4 @@
-package com.gulin.maven.glassfish.MavenRestaurantJsf.jsfbean;
+package com.gulin.restaurant.jsf;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -58,7 +58,7 @@ public class LoginBean implements Serializable {
         FacesContext.getCurrentInstance().responseComplete();
 
         // It's OK to return null here because Faces is just going to exit.
-        return null;
+        return "amdin/menu_items";
     }
     
     /**

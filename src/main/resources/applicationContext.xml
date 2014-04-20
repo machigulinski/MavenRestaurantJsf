@@ -75,7 +75,7 @@
         </sec:authentication-provider>
     </sec:authentication-manager>
     
-    <bean id="myAuthenticationHandler" class="com.gulin.maven.glassfish.MavenRestaurantJsf.util.MyAuthenticationHandler" />
+    <bean id="myAuthenticationHandler" class="com.gulin.restaurant.jsf.util.MyAuthenticationHandler" />
     
     <bean id="encoderBean" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
         <constructor-arg value="512" />

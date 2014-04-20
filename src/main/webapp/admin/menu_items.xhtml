@@ -12,49 +12,91 @@
         </ui:define>
         <ui:define name="body">
 
-	    <h:form> 
-		<h:link outcome="/index" value="HOME"/>
-		<br />
-		<h:commandLink action="#{menuItemController.prepareCreate}" value="#{bundle.ListMenuItemCreateLink}"/>
-		<br />
-		<br />
-		
+	    <h:form id="form" style="width:90%"> 
+		<p:commandLink action="/index" value="HOME"/>
+		<p:growl id="messages" showDetail="true"/>
 
-		<p:dataTable editable="true" editMode="cell" var="item" 
-			     value="#{menuItemController.menuItems}" 
-			     paginator="true" rows="10"  
-			     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} 
-			     {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
-			     rowsPerPageTemplate="5,10,15" 
-
-			     selectionMode="single" rowKey="#{item.itemId}"
-			     selection="#{menuItemController.selectedItem}"
-			     >
+		    <br />		
+		    <br />
 
 
-		    <p:column  sortBy="itemName" headerText="Menu Item">  
-			<h:outputText value="#{item.itemName}" />
-		    </p:column>  
+		    <p:dataTable id="menuTable" var="item" 
+				 value="#{menuItemController.menuItems}" 
+				 paginator="true" rows="10"  
+				 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} 
+				 {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+				 rowsPerPageTemplate="5,10,15" 
 
-		    <p:column  sortBy="itemInfo" headerText="What's in it?">  
-			<h:outputText value="#{item.itemInfo}" />
-		    </p:column>  
+				 selectionMode="single" rowKey="#{item.itemId}"
+				 selection="#{menuItemController.selectedItem}"
+				 >
+			<p:ajax event="rowSelect" listener="#{menuItemController.handleItemSelect()}" update=":form:itemToEdit" />
+
+
+			<p:column  sortBy="itemId" headerText="Menu Number">  
+			    <h:outputText value="#{item.itemId}" />
+			</p:column>
+
+			<p:column  sortBy="itemName" headerText="Menu Item">  
+			    <h:outputText value="#{item.itemName}" />
+			</p:column>  
+
+			<p:column  sortBy="itemInfo" headerText="What's in it?">  
+			    <h:outputText value="#{item.itemInfo}" />
+			</p:column>  
 
 
 
-		    <p:column  sortBy="itemPrice" headerText="Price">  
-			<h:outputText value="#{item.itemPrice}" />
-		    </p:column>  
+			<p:column  sortBy="itemPrice" headerText="Price">  
+			    <h:outputText value="#{item.itemPrice}" />
+			</p:column>  
 
-		    <p:column>
-			<f:facet name="header">
-			    <h:outputText value="&nbsp;"/>
-			</f:facet>
-			<h:outputText value=""/>
-			<h:commandLink action="#{menuItemController.deleteItem()}" value="#{bundle.ListMenuItemDestroyLink}"/>
-			
-		    </p:column>
-		</p:dataTable>
+			<p:column>
+			    <f:facet name="header">
+				<h:outputText value="&nbsp;"/>
+			    </f:facet>
+			    <h:outputText value=""/>
+			    <p:commandLink action="#{menuItemController.deleteItem()}" value="#{bundle.ListMenuItemDestroyLink}"/>
+
+			</p:column>
+		    </p:dataTable>
+
+		    <br />
+		    <br />
+
+		    <p:dataTable id="itemToEdit" editable="true" editMode="cell" var="selItem" 
+				 value="#{menuItemController.selectedItem}" >
+			<p:ajax event="cellEdit" listener="#{menuItemController.onCellEdit}" update=":form:messages :form:menuTable" /> 
+
+			<p:column  headerText="Menu Number" style="width:10%">  
+			    <h:outputText value="#{selItem.itemId}" />
+			</p:column>
+
+			<p:column headerText="Menu Item" style="width:25%">  
+			    <p:cellEditor>  
+				<f:facet name="output"><h:outputText value="#{selItem.itemName}" /></f:facet>  
+				<f:facet name="input"><p:inputText id="nameInput" value="#{selItem.itemName}" style="width:96%"/></f:facet>  
+			    </p:cellEditor>  
+			</p:column>  
+
+			<p:column headerText="Info" style="width:25%">  
+			    <p:cellEditor>  
+				<f:facet name="output"><h:outputText value="#{selItem.itemInfo}" /></f:facet>  
+				<f:facet name="input"><p:inputText id="infoInput" value="#{selItem.itemInfo}" style="width:96%"/></f:facet>  
+			    </p:cellEditor>  
+			</p:column> 
+
+			<p:column headerText="Price" style="width:10%">  
+			    <p:cellEditor>  
+				<f:facet name="output"><h:outputText value="#{selItem.itemPrice}" /></f:facet>  
+				<f:facet name="input"><p:inputText id="priceInput" value="#{selItem.itemPrice}" style="width:96%"/></f:facet>  
+			    </p:cellEditor>  
+			</p:column> 
+
+			<f:facet name="footer">  
+			    <h:commandLink id="nonAjax" action="#{menuItemController.prepareCreate()}" value="Enter New Item"  />  
+			</f:facet> 
+		    </p:dataTable>
 
 	    </h:form>  
 
